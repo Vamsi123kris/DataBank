@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataBank - Prototype</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .animate-pulse-fast {
+            animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .7; }
+        }
+        .toast {
+            visibility: hidden;
+            min-width: 250px;
+            margin-left: -125px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 16px;
+            position: fixed;
+            z-index: 1;
+            left: 50%;
+            bottom: 30px;
+            font-size: 17px;
+            opacity: 0;
+            transition: opacity 0.3s, visibility 0.3s, bottom 0.3s;
+        }
+        .toast.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 50px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+    <!-- App Container -->
+    <div class="w-full max-w-sm mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden">
+        <div id="main-view">
+            <!-- Header -->
+            <div class="bg-slate-800 text-white p-4">
+                <div class="flex justify-between items-center">
+                    <h1 class="text-xl font-bold">DataBank</h1>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse-fast"></div>
+                        <span class="text-sm font-medium text-green-300">Active</span>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-400 mt-1">Location: Vijayawada, AP</p>
+            </div>
+
+            <!-- Points Balance -->
+            <div class="p-6 text-center bg-slate-700">
+                <p class="text-sm font-medium text-slate-300">Your Points Balance</p>
+                <div class="flex items-center justify-center space-x-2 mt-2">
+                    <i class="fas fa-coins text-yellow-400 text-3xl"></i>
+                    <p id="points-balance" class="text-5xl font-bold text-white">2,450</p>
+                </div>
+            </div>
+
+            <!-- Data Usage -->
+            <div class="p-6">
+                <h2 class="text-sm font-semibold text-gray-600 mb-2">Today's Contribution</h2>
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                    <div id="data-bar" class="bg-blue-600 h-2.5 rounded-full" style="width: 15%"></div>
+                </div>
+                <div class="flex justify-between text-xs text-gray-500 mt-1">
+                    <span id="data-shared">Shared: 307 MB</span>
+                    <span>Daily Plan: 2 GB</span>
+                </div>
+            </div>
+
+            <!-- Redeem Button -->
+            <div class="px-6 pb-6">
+                <button onclick="showRewardsView()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 shadow-lg">
+                    <i class="fas fa-gift mr-2"></i> Redeem Your Points
+                </button>
+            </div>
+
+            <!-- Activity Log -->
+            <div class="px-6 pb-6">
+                <h3 class="text-sm font-semibold text-gray-600 mb-3">Recent Activity</h3>
+                <div id="activity-log" class="space-y-2 text-sm">
+                    <div class="flex items-center justify-between bg-green-50 p-2 rounded-lg">
+                        <span class="text-green-800">Query contribution</span>
+                        <span class="font-bold text-green-800">+5 Points</span>
+                    </div>
+                     <div class="flex items-center justify-between bg-green-50 p-2 rounded-lg">
+                        <span class="text-green-800">Query contribution</span>
+                        <span class="font-bold text-green-800">+8 Points</span>
+                    </div>
+                </div>
+            </div>
+            
+             <!-- Footer Nav -->
+            <div class="bg-gray-50 border-t p-2 text-center">
+                 <p class="text-xs text-gray-500">Refer a friend & earn 500 bonus points!</p>
+            </div>
+        </div>
+
+        <!-- Rewards View (Hidden by default) -->
+        <div id="rewards-view" class="hidden">
+            <div class="bg-slate-800 text-white p-4 flex items-center">
+                <button onclick="showMainView()" class="mr-4 text-white"><i class="fas fa-arrow-left"></i></button>
+                <h1 class="text-xl font-bold">Redeem Rewards</h1>
+            </div>
+            <div class="p-6 text-center bg-slate-700">
+                <p class="text-sm font-medium text-slate-300">Your Points Balance</p>
+                <div class="flex items-center justify-center space-x-2 mt-2">
+                    <i class="fas fa-coins text-yellow-400 text-3xl"></i>
+                    <p id="rewards-points-balance" class="text-5xl font-bold text-white">2,450</p>
+                </div>
+            </div>
+            <div class="p-4">
+                <h3 class="text-sm font-semibold text-gray-600 mb-3 px-2">Popular Rewards</h3>
+                <div class="space-y-3">
+                    <!-- Reward Item 1 -->
+                    <div class="flex items-center justify-between bg-white p-4 rounded-lg border">
+                        <div>
+                            <p class="font-bold text-gray-800">Amazon Gift Card</p>
+                            <p class="text-sm text-gray-500">₹100 Voucher</p>
+                        </div>
+                        <button onclick="redeemPoints(1000)" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg text-sm transition">
+                            1,000 Pts
+                        </button>
+                    </div>
+                    <!-- Reward Item 2 -->
+                    <div class="flex items-center justify-between bg-white p-4 rounded-lg border">
+                        <div>
+                            <p class="font-bold text-gray-800">Swiggy Voucher</p>
+                            <p class="text-sm text-gray-500">₹150 Off Coupon</p>
+                        </div>
+                        <button onclick="redeemPoints(1500)" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg text-sm transition">
+                            1,500 Pts
+                        </button>
+                    </div>
+                    <!-- Reward Item 3 -->
+                    <div class="flex items-center justify-between bg-white p-4 rounded-lg border">
+                        <div>
+                            <p class="font-bold text-gray-800">Zomato Voucher</p>
+                            <p class="text-sm text-gray-500">₹150 Off Coupon</p>
+                        </div>
+                        <button onclick="redeemPoints(1500)" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg text-sm transition">
+                            1,500 Pts
+                        </button>
+                    </div>
+                    <!-- Reward Item 4 -->
+                    <div class="flex items-center justify-between bg-white p-4 rounded-lg border">
+                        <div>
+                            <p class="font-bold text-gray-800">Mobile Recharge</p>
+                            <p class="text-sm text-gray-500">₹50 Top-up</p>
+                        </div>
+                        <button onclick="redeemPoints(500)" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg text-sm transition">
+                            500 Pts
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script>
+        // --- STATE MANAGEMENT ---
+        let currentPoints = 2450;
+        let dataSharedMb = 307;
+        const dailyPlanMb = 2048; // 2GB
+
+        // --- DOM ELEMENTS ---
+        const pointsBalanceEl = document.getElementById('points-balance');
+        const rewardsPointsBalanceEl = document.getElementById('rewards-points-balance');
+        const dataBarEl = document.getElementById('data-bar');
+        const dataSharedEl = document.getElementById('data-shared');
+        const activityLogEl = document.getElementById('activity-log');
+        const mainView = document.getElementById('main-view');
+        const rewardsView = document.getElementById('rewards-view');
+        const toastEl = document.getElementById('toast');
+
+        // --- FUNCTIONS ---
+
+        // Function to update all UI elements with current state
+        function updateUI() {
+            pointsBalanceEl.innerText = currentPoints.toLocaleString();
+            rewardsPointsBalanceEl.innerText = currentPoints.toLocaleString();
+            
+            dataSharedEl.innerText = `Shared: ${dataSharedMb} MB`;
+            const dataPercentage = (dataSharedMb / dailyPlanMb) * 100;
+            dataBarEl.style.width = `${dataPercentage}%`;
+        }
+
+        // Function to show a toast notification
+        function showToast(message, isSuccess = true) {
+            toastEl.innerText = message;
+            toastEl.className = `toast show ${isSuccess ? 'bg-green-500' : 'bg-red-500'}`;
+            setTimeout(() => {
+                toastEl.className = toastEl.className.replace("show", "");
+            }, 3000);
+        }
+
+        // Simulate earning points in real-time
+        function simulateEarning() {
+            const pointsEarned = Math.floor(Math.random() * 5) + 3; // Earn 3 to 7 points
+            const dataUsed = Math.floor(Math.random() * 10) + 5; // Use 5 to 14 MB
+
+            currentPoints += pointsEarned;
+            dataSharedMb += dataUsed;
+            
+            if (dataSharedMb > dailyPlanMb) {
+                dataSharedMb = dailyPlanMb;
+            }
+
+            updateUI();
+            addActivityLog(pointsEarned);
+        }
+
+        // Add a new entry to the activity log
+        function addActivityLog(points) {
+            const newLog = document.createElement('div');
+            newLog.className = 'flex items-center justify-between bg-green-50 p-2 rounded-lg';
+            newLog.innerHTML = `
+                <span class="text-green-800">Query contribution</span>
+                <span class="font-bold text-green-800">+${points} Points</span>
+            `;
+            activityLogEl.prepend(newLog);
+
+            // Keep the log from getting too long
+            if (activityLogEl.children.length > 5) {
+                activityLogEl.removeChild(activityLogEl.lastChild);
+            }
+        }
+
+        // --- VIEW NAVIGATION ---
+        function showMainView() {
+            mainView.classList.remove('hidden');
+            rewardsView.classList.add('hidden');
+        }
+
+        function showRewardsView() {
+            rewardsView.classList.remove('hidden');
+            mainView.classList.add('hidden');
+            updateUI(); // Ensure points are updated on rewards screen
+        }
+
+        // --- USER ACTIONS ---
+        function redeemPoints(cost) {
+            if (currentPoints >= cost) {
+                currentPoints -= cost;
+                updateUI();
+                showToast("Redemption successful!", true);
+                showMainView();
+            } else {
+                showToast("Not enough points!", false);
+            }
+        }
+
+        // --- INITIALIZATION ---
+        // Initial UI setup
+        updateUI();
+        // Start the simulation loop
+        setInterval(simulateEarning, 4000); // Earn points every 4 seconds
+    </script>
+
+</body>
+</html>
